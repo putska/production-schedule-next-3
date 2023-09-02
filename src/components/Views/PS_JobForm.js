@@ -191,6 +191,8 @@ const JobForm = (props) => {
     } else {
       await handleAdd(formData, "job");
     }
+    revalidatePath("/production-schedule");
+    console.log("revalidated");
     setFormVisible(false);
   };
 
