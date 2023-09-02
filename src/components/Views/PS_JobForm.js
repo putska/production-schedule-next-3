@@ -182,6 +182,7 @@ const JobForm = (props) => {
   const handleClose = () => {
     setOpen(false);
     revalidatePath("/production-schedule");
+    console.log("revalidated");
   };
 
   const savePopupForm = async () => {
