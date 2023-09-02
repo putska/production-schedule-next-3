@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import DataGrid, {
   Column,
@@ -181,8 +182,6 @@ const JobForm = (props) => {
 
   const handleClose = () => {
     setOpen(false);
-    revalidatePath("/production-schedule");
-    console.log("revalidated");
   };
 
   const savePopupForm = async () => {
@@ -191,7 +190,8 @@ const JobForm = (props) => {
     } else {
       await handleAdd(formData, "job");
     }
-    revalidatePath("/production-schedule");
+    console.log("revalidating production-schedule");
+    await fetch(`/api/handler?path=/production-schedule&secret=1234`);
     console.log("revalidated");
     setFormVisible(false);
   };
