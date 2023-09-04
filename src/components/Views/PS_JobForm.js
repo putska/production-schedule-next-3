@@ -191,7 +191,7 @@ const JobForm = (props) => {
       await handleAdd(formData, "job");
     }
     console.log("revalidating production-schedule");
-    await fetch(`/api/handler?path=/production-schedule&secret=1234`);
+    await fetch(`/api/handler?path=/shop-drawings&secret=1234`);
     console.log("revalidated");
     setFormVisible(false);
   };
