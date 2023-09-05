@@ -14,7 +14,6 @@ import {
     deleteData,
     convertDates,
     calculateForOffSetsNew,
-    updateDataWithJSON,
     updateJSONWithData,
     addDataToJSON,
     addJSONData,
@@ -24,6 +23,8 @@ import { revalidatePath } from "next/cache";
 
 const categoryKey = "production-schedule";
 const jobsKey = "production-schedule";
+
+const officialStartDate = "1/1/2022"
 
 const customColumns = [
     {
@@ -81,16 +82,17 @@ export default function ProductionSchedulePage(props: any) {
     const [selectedIndex, setSelectedIndex] = useState(0);
 
     useEffect(() => {
+        console.log(jobs)
         const newJobs = JSON.parse(JSON.stringify(jobs));
         const firstJob = newJobs[0];
 
         const {
             newCols,
             newColsX
-        } = calculateForOffSetsNew(firstJob.shopStart, startDate, endDate);
+        } = calculateForOffSetsNew(officialStartDate, startDate, endDate);
 
         newJobs.forEach((job: any, index: any) => {
-            const startOffset = toWeeks(firstJob.shopStart, job.shopStart);
+            const startOffset = toWeeks(officialStartDate, job.shopStart);
             const shopColor = settings.find((shop: any) => shop.ID === job.shopID);
 
             newCols.forEach((innerCol: any) => {
@@ -123,6 +125,7 @@ export default function ProductionSchedulePage(props: any) {
                 newJobs[index][dataField] = displayUnits;
             })
         })
+
         setCols(newCols);
         setColsX(newColsX);
         setJobsData(newJobs);
@@ -175,11 +178,8 @@ export default function ProductionSchedulePage(props: any) {
     }, [jobsData, settings, cols, colsX, startDate, endDate]);
 
     const handleDateChange = (key: any, value: any) => {
-        if (key === "startDate") {
-            setStartDate(value);
-        } else if (key === "endDate") {
-            setEndDate(value);
-        }
+        if (key === "startDate") {setStartDate(value) }
+        else if (key === "endDate") { setEndDate(value) }
     }
 
     async function handleUpdate(data: any, endpoint: any) {
@@ -189,6 +189,7 @@ export default function ProductionSchedulePage(props: any) {
                     const newData = addDataToJSON(data);
                     // const resData = await putData("/UpdateSettings", newData);
                     const resData = await putData("/GetSettings", newData);
+                    console.log(newData)
                     setSettings((prev: any) => {
                         let items = prev.filter((item: any) => data.ID !== item.ID);
                         return [...items, data];
@@ -200,6 +201,7 @@ export default function ProductionSchedulePage(props: any) {
                     const newData = updateJSONWithData(data, categoryKey);
                     // const resData = await putData("/PutJob", newData);
                     const resData = await putData("/GetJobs", newData);
+                    console.log(data, newData)
                     setJobs((prev: any) => {
                         let items = prev.filter((item: any) => data.ID !== item.ID);
                         return [...items, data];
@@ -231,7 +233,6 @@ export default function ProductionSchedulePage(props: any) {
                     const newData = updateJSONWithData(data, categoryKey);
                     // let resData = await postData("/PostJob", newData);
                     let resData = await postData("/GetJobs", newData);
-                    resData = updateDataWithJSON(resData, categoryKey)
 
                     setJobs((prev: any) => {
                         let items = prev.filter((item: any) => resData.ID !== item.ID && item.ID);
@@ -258,7 +259,6 @@ export default function ProductionSchedulePage(props: any) {
                 try {
                     const newData = updateJSONWithData(data, categoryKey);
                     // const resData = await deleteData("/DeleteJob", newData);
-                    console.log(newData)
                     const resData = await deleteData("/GetJobs", newData);
                     setJobs((prev: any) => prev.filter((item: any) => item.ID !== newData.ID));
                 } catch (error) { console.log(error) }

@@ -616,7 +616,7 @@ export default function GanttView(props) {
                             dataField='shopStart'
                             caption='Shop Start Date'
                             alignment='center'
-                            defaultSortOrder="asc"
+                            sortOrder="asc"
                             allowSorting
                             dataType="date"
                             allowEditing={false}
@@ -667,7 +667,7 @@ export default function GanttView(props) {
                                                     headerFullDate={innerCol.date}
                                                     cellRender={cell => {
                                                         const cellData = cell.data[cell.column.dataField];
-                                                        return (
+                                                        return ( cellData &&
                                                             <Grid container spacing={1} direction="column">
                                                                 {cellData.planned &&
                                                                     <Grid item sx={{ fontWeight: "bold", minHeight: "40px" }}>

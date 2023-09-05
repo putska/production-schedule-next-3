@@ -4,13 +4,14 @@ import {
     putData,
     postData,
     deleteData,
-    updateDataWithJSON,
     updateJSONWithData,
     addJSONData,
-    addDataToJSON
+    addDataToJSON,
+    deconstructJobData,
+    convertDates,
+    getDisplayUnits,
+    createCategoryData
 } from "@/lib/helper-functions";
-
-import Checkbox from '@mui/material/Checkbox';
 
 import CustomView from "@/src/components/Views/CustomView";
 
@@ -25,81 +26,16 @@ export default function PanelMatrixPage(props: any) {
 
     const [canEdit, setCanEdit] = useState(true);
 
-    const [jobs, setJobs] = useState(loadedJobs);
-    const [shops, setShops] = useState(loadedSettings.filter((setting:any) => setting.category === "shops"))
-    const [settings, setSettings] = useState(loadedSettings.filter((setting:any) => setting.category === categoryKey));
+    const [jobs, setJobs] = useState(deconstructJobData(loadedJobs, categoryKey));
+    const [shops, setShops] = useState(loadedSettings.filter((setting: any) => setting.category === "shops"))
+    const [settings, setSettings] = useState(loadedSettings.filter((setting: any) => setting.category === categoryKey));
 
     const [currCategoryData, setCurrCategoryData] = useState([]);
-    const [colorOptions, setColorOptions] = useState([]);
 
     useEffect(() => {
-        const newColorOptions = addJSONData(settings);
-        setColorOptions(newColorOptions);
-    }, [settings])
-
-    useEffect(() => {
-        let newJobs = jobs.map((job: any) => ({ ...job, JSON: typeof job.JSON === "string" ? JSON.parse(job.JSON) : { ...job.JSON } }))
-        newJobs = convertDates(newJobs);
-        const newCategoryData = newJobs.map((job: any) => {
-
-            let newJobData: any = { ID: job.ID, shopID: job.shopID, JSON: job.JSON }
-
-            tabColumns.forEach((col: any) => {
-                if (col.columns) {
-                    col.columns.forEach((subCol: any) => {
-                        newJobData[subCol.dataField] = getDisplayUnits(job, subCol);
-                    })
-                } else {
-                    newJobData[col.dataField] = getDisplayUnits(job, col);
-                }
-            })
-            return newJobData;
-        })
+        let newCategoryData = createCategoryData(jobs, categoryKey, tabColumns);
         setCurrCategoryData(newCategoryData);
     }, [jobs])
-
-    const getDisplayUnits = (job: any, col: any) => {
-        const categoryData = job.JSON[categoryKey] && job.JSON[categoryKey][col.dataField];
-        const jobData = job.JSON[jobsKey] && job.JSON[jobsKey][col.dataField];
-
-        let displayUnits = { value: "", status: "" }
-
-        if (categoryData) {
-            displayUnits.value = categoryData.value;
-            displayUnits.status = categoryData.status;
-        }
-        if (jobData) {
-            displayUnits.value = jobData;
-        }
-        return displayUnits;
-    }
-
-    const convertDates = (jobs: any) => {
-        let dateFields = [
-            "shopStart",
-            "fieldStart",
-            "metalTakeoff",
-            "orderWeekOf",
-            "panelFabs",
-            "panelRelease",
-            "glassTakeoff",
-            "shopUseBrakeShapesAndSteel",
-            "doorSchedule"
-        ];
-
-        let updatedJobs = JSON.parse(JSON.stringify(jobs));
-        updatedJobs.forEach((job: any) => {
-            dateFields.forEach((field) => {
-                job.JSON[jobsKey][field] = job.JSON[jobsKey][field] ? new Date(job.JSON[jobsKey][field]) : new Date();
-            });
-        });
-
-        updatedJobs.sort(function (a: any, b: any) {
-            return a.JSON[jobsKey].shopStart.getTime() - b.JSON[jobsKey].shopStart.getTime();
-        });
-
-        return updatedJobs;
-    }
 
     async function handleUpdate(data: any, endpoint: any) {
         switch (endpoint) {
@@ -109,8 +45,8 @@ export default function PanelMatrixPage(props: any) {
                     // const resData = await putData("/PutJob", newData);
                     const resData = await putData("/GetJobs", newData);
                     setJobs((prev: any) => {
-                        let items = prev.filter((item: any) => newData.ID !== item.ID);
-                        return [...items, newData];
+                        let items = prev.filter((item: any) => data.ID !== item.ID);
+                        return [...items, data];
                     })
                 } catch (error) { console.log(error) }
                 break;
@@ -192,6 +128,7 @@ export default function PanelMatrixPage(props: any) {
             caption: 'Shop Start',
             alignment: 'center',
             canEdit: true,
+            sortOrder: "asc"
         },
         {
             dataField: 'fieldStart',
@@ -396,7 +333,7 @@ export default function PanelMatrixPage(props: any) {
             data={currCategoryData}
             tabColumns={tabColumns}
             categoryKey={categoryKey}
-            colorOptions={colorOptions}
+            colorOptions={settings}
 
             handleUpdate={handleUpdate}
             handleAdd={handleAdd}
@@ -406,7 +343,7 @@ export default function PanelMatrixPage(props: any) {
     )
 }
 
-export async function getServerSideProps() {
+export async function getStaticProps() {
     let loadedJobs = await loadData("/GetJobs");
     if (loadedJobs) {
         loadedJobs = Object.entries(loadedJobs).map((item: any) => {

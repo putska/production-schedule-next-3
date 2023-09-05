@@ -11,7 +11,6 @@ import {
     deleteData,
     convertDates,
     calculateForOffSetsNew,
-    updateDataWithJSON,
     updateJSONWithData,
     getDataByCategory,
     addJSONData,
@@ -225,7 +224,7 @@ export default function MetalPage(props: any) {
     )
 }
 
-export async function getServerSideProps() {
+export async function getStaticProps() {
     // const loadedJobs = await loadData("/GetJobs");
     // const loadedSettings = await getDataByCategory("/GetSettings", "shops");
 

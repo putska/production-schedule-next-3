@@ -14,9 +14,8 @@ import {
     putData,
     postData,
     deleteData,
-    updateDataWithJSON,
-    updateJSONWithData,
-    toDays
+    toDays,
+    deconstructJobData
 } from "@/lib/helper-functions";
 
 const jobsKey = "production-schedule";
@@ -27,11 +26,12 @@ export default function TakeoffMatrixPage(props:any) {
     const [canEdit, setCanEdit] = useState(true)
     const [takeoffData, setTakeoffData] = useState([]);
     const [hJobs, sethJobs] = useState([]);
-    const [jobs, setJobs] = useState(loadedJobs);
+    const [jobs, setJobs] = useState(deconstructJobData(loadedJobs, jobsKey));
     const [takeoffMatrixs, setTakeoffMatrixs] = useState(loadedTakeoffMatrixs);
 
     useEffect(() => {
-        const newJobs = updateDataWithJSON(jobs, jobsKey)
+        console.log(jobs)
+        const newJobs = JSON.parse(JSON.stringify(jobs))
         const createdRows = createRows(takeoffMatrixs, dateRows, newJobs, weeks);
         setTakeoffData(createdRows);
 
@@ -139,7 +139,7 @@ export async function getStaticProps() {
         }
     })
 
-    const weeks = calculateWeeks(updateDataWithJSON(loadedJobs, jobsKey));
+    const weeks = calculateWeeks(deconstructJobData(loadedJobs, jobsKey));
     const dateRows = createBasicRows(new Date(), weeks);
 
     return {

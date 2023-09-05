@@ -23,7 +23,7 @@ import DataGrid, {
     Scrolling,
     Button
 } from "devextreme-react/data-grid";
-import { TagBox, ColorBox } from "devextreme-react";
+import { TagBox, ColorBox, DateBox } from "devextreme-react";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import {
@@ -139,6 +139,7 @@ export default function CustomView(props) {
 
     const handleCellClick = (cell) => {
         const cellData = cell.data[cell.column.dataField];
+        // console.log(cell.data)
 
         setSelectedCell(cell);
         setFormData({ value: cellData.value, status: cellData.status })
@@ -377,14 +378,26 @@ export default function CustomView(props) {
 
             <Dialog open={dialogVisible} onClose={handleDialogClose}>
                 <DialogContent>
-                    {(selectedCell?.column && selectedCell.column.dataType !== "boolean" && selectedCell.column.canEdit) &&
+                    {(selectedCell?.column && selectedCell.column.dataType === "string" && selectedCell.column.canEdit) &&
                         <TextField
-                            value={formData.value}
+                            value={formData.value ? formData.value : null}
                             type={selectedCell.column ? selectedCell.column.dataType : ""}
                             onChange={(e) => handleInputChange("value", e.target.value)}
                             fullWidth
                             label={selectedCell.column ? selectedCell.column.caption : ""}
-                        />}
+                        />
+                    }
+
+                    {(selectedCell?.column && selectedCell.column.dataType === "date" && selectedCell.column.canEdit) &&
+                        <DateBox
+                            value={formData.value ? formData.value : null}
+                            type={selectedCell.column ? selectedCell.column.dataType : ""}
+                            onValueChanged={(e) => handleInputChange("value", e.value)}
+                            fullWidth
+                            style={{ padding: "10px"}}
+                            label={selectedCell.column ? selectedCell.column.caption : ""}
+                        />
+                    }
 
                     {(selectedCell?.column && selectedCell.column.dataType === "boolean" && selectedCell.column.canEdit) &&
                         <FormControlLabel
@@ -396,17 +409,6 @@ export default function CustomView(props) {
                             label={selectedCell.column ? selectedCell.column.caption : ""}
                         />
                     }
-
-                    {/* {(selectedCell?.column && selectedCell.column.dataType === "boolean" && selectedCell.column.canEdit) &&
-                        <FormControlLabel
-                            control={<Checkbox
-                                checked={formData.value}
-                                onChange={(e) => handleInputChange("value", e.target.checked)}
-                                fullWidth
-                            />}
-                            label={selectedCell.column ? selectedCell.column.caption : ""}
-                        />
-                    } */}
 
                     <FormControl fullWidth variant="outlined" style={{ marginTop: 10 }}>
                         <InputLabel>Status</InputLabel>

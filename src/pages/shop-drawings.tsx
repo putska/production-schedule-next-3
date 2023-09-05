@@ -19,11 +19,9 @@ import {
   getJobColor,
   convertDates,
   getHighlight,
-  getDataByCategory,
-  updateDataWithJSON,
-  updateJSONWithData,
   addDataToJSON,
   addJSONData,
+  deconstructJobData,
 } from "@/lib/helper-functions";
 import DailyView from "@/src/components/Views/DailyView";
 import WeeklyView from "@/src/components/Views/WeeklyView";
@@ -80,9 +78,8 @@ function ShopDrawingsPage(props: any) {
   const [selectedMonday, setSelectedMonday] = useState(new Date());
   const [week, setWeek] = useState([]);
 
-  const [jobs, setJobs] = useState(
-    convertDates(updateDataWithJSON(loadedJobs, jobsKey))
-  );
+  const updatedJobs = convertDates(deconstructJobData(loadedJobs, jobsKey));
+  const [jobs, setJobs] = useState(updatedJobs);
   const [employeeNames, setEmployeeNames] = useState(loadedEmployees);
   const [employeeNotes, setEmployeeNotes] = useState(loadedEmployeeNotes);
   const [tasks, setTasks] = useState(loadedTasks);

@@ -5,10 +5,11 @@ import {
     postData,
     deleteData,
     loadAllActivitiesDates,
-    updateDataWithJSON,
     updateJSONWithData,
     addJSONData,
-    addDataToJSON
+    addDataToJSON,
+    deconstructJobData,
+    createCategoryData
 } from "@/lib/helper-functions";
 
 import CustomView from "@/src/components/Views/CustomView";
@@ -33,79 +34,20 @@ export default function PanelMatrixPage(props: any) {
 
     const [canEdit, setCanEdit] = useState(true);
 
-    const [jobs, setJobs] = useState(loadedJobs);
-    const [shops, setShops] = useState(loadedSettings.filter((setting:any) => setting.category === "shops"))
-    const [settings, setSettings] = useState(loadedSettings.filter((setting:any) => setting.category === categoryKey));
+    const [jobs, setJobs] = useState(deconstructJobData(loadedJobs, categoryKey));
+    const [shops, setShops] = useState(loadedSettings.filter((setting: any) => setting.category === "shops"))
+    const [settings, setSettings] = useState(loadedSettings.filter((setting: any) => setting.category === categoryKey));
 
     const [currCategoryData, setCurrCategoryData] = useState([]);
 
     useEffect(() => {
-        let newJobs = jobs.map((job: any) => ({ ...job, JSON: typeof job.JSON === "string" ? JSON.parse(job.JSON) : { ...job.JSON } }))
-        newJobs = convertDates(newJobs);
-        const newCategoryData = newJobs.map((job: any) => {
-
-            let newJobData: any = { ID: job.ID, shopID: job.shopID, JSON: job.JSON }
-
-            tabColumns.forEach((col: any) => {
-                if (col.columns) {
-                    col.columns.forEach((subCol: any) => {
-                        newJobData[subCol.dataField] = getDisplayUnits(job, subCol);
-                    })
-                } else {
-                    newJobData[col.dataField] = getDisplayUnits(job, col);
-                }
-            })
-            return newJobData;
-        })
+        let newCategoryData = createCategoryData(jobs, categoryKey, tabColumns);
 
         setShopDrawings(tasks.filter((task: any) => task.category === shopDrawings_categoryKey));
         setFabMatrixs(tasks.filter((task: any) => task.category === fabDrawings_categoryKey));
 
         setCurrCategoryData(newCategoryData);
     }, [jobs])
-
-    const getDisplayUnits = (job: any, col: any) => {
-        const categoryData = job.JSON[categoryKey] && job.JSON[categoryKey][col.dataField];
-        const jobData = job.JSON[jobsKey] && job.JSON[jobsKey][col.dataField];
-
-        let displayUnits = { value: "", status: "" }
-
-        if (categoryData) {
-            displayUnits.value = categoryData.value;
-            displayUnits.status = categoryData.status;
-        }
-        if (jobData) {
-            displayUnits.value = jobData;
-        }
-        return displayUnits;
-    }
-
-    const convertDates = (jobs: any) => {
-        let dateFields = [
-            "shopStart",
-            "fieldStart",
-            "metalTakeoff",
-            "orderWeekOf",
-            "panelFabs",
-            "panelRelease",
-            "glassTakeoff",
-            "shopUseBrakeShapesAndSteel",
-            "doorSchedule"
-        ];
-
-        let updatedJobs = JSON.parse(JSON.stringify(jobs));
-        updatedJobs.forEach((job: any) => {
-            dateFields.forEach((field) => {
-                job.JSON[jobsKey][field] = job.JSON[jobsKey][field] ? new Date(job.JSON[jobsKey][field]) : new Date();
-            });
-        });
-
-        updatedJobs.sort(function (a: any, b: any) {
-            return a.JSON[jobsKey].shopStart.getTime() - b.JSON[jobsKey].shopStart.getTime();
-        });
-
-        return updatedJobs;
-    }
 
     async function handleUpdate(data: any, endpoint: any) {
         switch (endpoint) {
@@ -423,7 +365,7 @@ export default function PanelMatrixPage(props: any) {
     )
 }
 
-export async function getServerSideProps() {
+export async function getStaticProps() {
     // const loadedJobs = await loadData("/GetJobs");
     // const loadedTasks = await loadData("/GetTasks");
     const dates = await loadAllActivitiesDates();
