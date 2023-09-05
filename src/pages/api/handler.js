@@ -10,8 +10,8 @@ const paths = [
   "/field",
   "/packaging",
   "/purchasing",
-  "/jmp-field-tracking"
-]
+  "/jmp-field-tracking",
+];
 
 export default async function handler(req, res) {
   // Check for secret to confirm this is a valid request
@@ -20,33 +20,24 @@ export default async function handler(req, res) {
   //   return res.status(401).json({ message: 'Invalid token' })
   // }
 
-
   try {
-
     // const paths = await api.pathsToRevalidate()
     // console.log(paths)
-
     // // Revalidate every path
     // await Promise.all(paths.map(res.revalidate))
-
     // for (let path of paths) {
     //   try {
     //     await res.revalidate(path)
     //   } catch (error) {
     //     console.log(error)
     //   }
-      
     // }
-
-    await res.revalidate("/")
-
-
+    //await res.revalidate("/")
     // Return a response to confirm everything went ok
-    return res.json({ revalidated: true })
-
+    //return res.json({ revalidated: true })
   } catch (err) {
     // If there was an error, Next.js will continue
     // to show the last successfully generated page
-    return res.status(500).send('Error revalidating: ' + err)
+    //return res.status(500).send('Error revalidating: ' + err)
   }
 }
