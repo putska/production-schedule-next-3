@@ -625,6 +625,7 @@ export const getStaticProps = async () => {
     },
     revalidate: 10,
   };
+  revalidatePath("/shop-drawings");
 };
 
 export default ShopDrawingsPage;
