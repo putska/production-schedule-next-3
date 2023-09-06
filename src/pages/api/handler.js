@@ -19,14 +19,15 @@ export default async function handler(req, res) {
   // if (req.query.secret !== process.env.MY_SECRET_TOKEN) {
   //   return res.status(401).json({ message: 'Invalid token' })
   // }
-
+  //console.log("requst", req);
+  //console.log("res", res);
   try {
-    // const paths = await api.pathsToRevalidate()
-    // console.log(paths)
+    //const paths = await api.pathsToRevalidate();
+    console.log(paths);
 
     // // Revalidate every path
     // await Promise.all(paths.map(res.revalidate))
-
+    paths.forEach(res.revalidate);
     // for (let path of paths) {
     //   try {
     //     await res.revalidate(path)
@@ -36,7 +37,7 @@ export default async function handler(req, res) {
 
     // }
 
-    await res.revalidate("/");
+    //await res.revalidate("/");
 
     // Return a response to confirm everything went ok
     return res.json({ revalidated: true });
