@@ -1,17 +1,18 @@
-const paths = [
-  "/production-schedule",
-  "/shop-drawings",
-  "/panel-matrix",
-  "/takeoff-matrix",
-  "/fab-matrix",
-  "/all-activities",
-  "/glass-and-gasket",
-  "/metal",
-  "/field",
-  "/packaging",
-  "/purchasing",
-  "/jmp-field-tracking",
-];
+// const paths = [
+//   "/production-schedule",
+//   "/shop-drawings",
+//   "/panel-matrix",
+//   "/takeoff-matrix",
+//   "/fab-matrix",
+//   "/all-activities",
+//   "/glass-and-gasket",
+//   "/metal",
+//   "/field",
+//   "/packaging",
+//   "/purchasing",
+//   "/jmp-field-tracking",
+// ];
+const paths = ["/production-schedule", "/shop-drawings"];
 
 export default async function handler(req, res) {
   // Check for secret to confirm this is a valid request
