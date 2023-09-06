@@ -21,29 +21,31 @@ export default async function handler(req, res) {
   // }
   //console.log("requst", req);
   //console.log("res", res);
-  try {
-    //const paths = await api.pathsToRevalidate();
-    console.log(paths);
+  //try {
+  //const paths = await api.pathsToRevalidate();
+  //console.log(paths);
 
-    // // Revalidate every path
-    // await Promise.all(paths.map(res.revalidate))
-    paths.forEach(res.revalidate);
-    // for (let path of paths) {
-    //   try {
-    //     await res.revalidate(path)
-    //   } catch (error) {
-    //     console.log(error)
-    //   }
+  // // Revalidate every path
+  // await Promise.all(paths.map(res.revalidate))
+  //paths.forEach(res.revalidate);
+  for (let path of paths) {
+    try {
+      await res.revalidate(path);
+      console.log("revalidated", path);
+      return res.json({ revalidated: true });
+    } catch (error) {
+      console.log(error);
+    }
 
     // }
 
     //await res.revalidate("/");
 
     // Return a response to confirm everything went ok
-    return res.json({ revalidated: true });
-  } catch (err) {
+    //return res.json({ revalidated: true });
+    //} catch (err) {
     // If there was an error, Next.js will continue
     // to show the last successfully generated page
-    return res.status(500).send("Error revalidating: " + err);
+    //return res.status(500).send("Error revalidating: " + err);
   }
 }
